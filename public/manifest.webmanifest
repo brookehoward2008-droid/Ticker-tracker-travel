@@ -1,0 +1,20 @@
+{
+  "name": "TravelTicker - Travel Deal Watchlist",
+  "short_name": "TravelTicker",
+  "description": "A phone-ready travel fare ticker for cruises, flights, vacation packages, all-inclusive resorts, and hotels.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#14171C",
+  "theme_color": "#14171C",
+  "orientation": "portrait-primary",
+  "categories": ["travel", "shopping", "finance", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/travelticker-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
