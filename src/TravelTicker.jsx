@@ -548,31 +548,24 @@ export default function TravelTicker() {
   const [now, setNow] = useState(new Date());
   const [refreshing, setRefreshing] = useState(false);
 
-  // Session id persisted via Claude's artifact storage (not raw browser
-  // localStorage) so a returning visit keeps the same watchlist rows.
+  // Session id persisted in localStorage so a returning visit keeps the
+  // same watchlist rows.
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      let id = null;
+    let id = null;
+    try {
+      id = window.localStorage.getItem("tt_session_id");
+    } catch (e) {
+      /* storage unavailable (e.g. private browsing) — fall through to a fresh in-memory id */
+    }
+    if (!id) {
+      id = crypto.randomUUID();
       try {
-        const existing = await window.storage.get("tt_session_id");
-        id = existing?.value || null;
+        window.localStorage.setItem("tt_session_id", id);
       } catch (e) {
-        /* storage unavailable — fall through to a fresh in-memory id */
+        /* ignore — watchlist still works for this page view */
       }
-      if (!id) {
-        id = crypto.randomUUID();
-        try {
-          await window.storage.set("tt_session_id", id);
-        } catch (e) {
-          /* ignore — watchlist still works for this page view */
-        }
-      }
-      if (!cancelled) setSessionId(id);
-    })();
-    return () => {
-      cancelled = true;
-    };
+    }
+    setSessionId(id);
   }, []);
 
   const loadTicker = useCallback(async (isBackground) => {
