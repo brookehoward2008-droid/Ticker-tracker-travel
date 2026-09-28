@@ -8,7 +8,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-import { Star, X, RefreshCw, TrendingDown, TrendingUp, Radio, AlertCircle, Bell, BellRing, Trash2 } from "lucide-react";
+import { Star, X, RefreshCw, TrendingDown, TrendingUp, Radio, AlertCircle, Bell, BellRing, Trash2, ExternalLink } from "lucide-react";
 
 // ---------------------------------------------------------------------------
 // Backend wiring — this talks directly to the real, live travel-price-tracker
@@ -56,6 +56,16 @@ const clock = (d) =>
 
 const shortTime = (iso) =>
   new Date(iso).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+
+// A real, provider-issued deep link (currently only flights carry one,
+// built server-side from clean IATA codes). Everything else gets an honest
+// fallback: a Google search for the exact provider/name/subtitle, built
+// client-side so it never guesses a slug that could 404.
+function dealLink(item) {
+  if (item.deep_link) return item.deep_link;
+  const query = [item.provider, item.name, item.subtitle].filter(Boolean).join(" ");
+  return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+}
 
 function downsample(points, target = 160) {
   if (points.length <= target) return points;
@@ -268,6 +278,17 @@ function ItemCard({ item, watched, alertCount, onToggleWatch, onOpen }) {
           <SourceBadge source={item.price_source} />
         </div>
       </div>
+
+      <a
+        href={dealLink(item)}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+        className="flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-semibold"
+        style={{ backgroundColor: "#20242C", color: "#EDEDE6", border: "1px solid #2A2F38" }}
+      >
+        View deal <ExternalLink size={14} />
+      </a>
     </div>
   );
 }
@@ -385,6 +406,21 @@ function Drawer({ item, watched, alerts, onToggleWatch, onCreateAlert, onDeleteA
           <Star size={16} fill={watched ? "#E8A33D" : "none"} color={watched ? "#E8A33D" : "#EDEDE6"} />
           {watched ? "Watching this fare" : "Watch this fare"}
         </button>
+
+        <a
+          href={dealLink(item)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 rounded-lg py-2.5 font-semibold text-sm"
+          style={{ backgroundColor: "#E8A33D", color: "#14171C" }}
+        >
+          View this deal <ExternalLink size={16} />
+        </a>
+        {!item.deep_link && (
+          <div className="text-xs -mt-3" style={{ color: "#4A505B" }}>
+            No direct booking link for this category yet — opens a search for this exact fare instead.
+          </div>
+        )}
 
         <div>
           <div className="flex items-center justify-between mb-2">
