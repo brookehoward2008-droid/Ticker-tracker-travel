@@ -24,6 +24,10 @@ permissions:
   issues: write                 # Required to create github issues
 jobs:
   blackducksca:
+    # Skip cleanly instead of failing every run when the Black Duck SCA
+    # server isn't configured for this repo yet (no BLACKDUCKSCA_URL
+    # variable / BLACKDUCKSCA_TOKEN secret set).
+    if: ${{ vars.BLACKDUCKSCA_URL != '' && secrets.BLACKDUCKSCA_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source
@@ -34,7 +38,7 @@ jobs:
         uses: blackduck-inc/black-duck-security-scan@v2
         with:
           ### SCANNING: Required fields
-          blackducksca_url: ${{ vars.BLACKDUCKSCA_URL }}
+          blackducksca_url: ${{ vars.BLACKDUCKSCA_URL || secrets.BLACKDUCKSCA_URL }}
           blackducksca_token: ${{ secrets.BLACKDUCKSCA_TOKEN }}
           ### Configuration if Bridge diagnostic files needs to be uploaded
           include_diagnostics: true
