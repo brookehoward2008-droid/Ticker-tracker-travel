@@ -24,9 +24,6 @@ permissions:
   issues: write                 # Required to create github issues
 jobs:
   blackducksca:
-    # Skip cleanly instead of failing every run when the Black Duck SCA
-    # server isn't configured for this repo yet (no BLACKDUCKSCA_URL
-    # variable / BLACKDUCKSCA_TOKEN secret set).
     if: ${{ vars.BLACKDUCKSCA_URL != '' && secrets.BLACKDUCKSCA_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
